@@ -2,12 +2,14 @@ package it.jdk.gestioneforum.cms.repository.sezione;
 
 import it.jdk.gestioneforum.cms.$exception.RepositoryException;
 import it.jdk.gestioneforum.cms.model.Articolo;
-import it.jdk.gestioneforum.cms.model.Categoria;
 import it.jdk.gestioneforum.cms.model.Sezione;
 import it.jdk.gestioneforum.cms.persistence.ArticoloEntity;
 import it.jdk.gestioneforum.cms.persistence.SezioneEntity;
+import it.jdk.gestioneforum.cms.repository.articolo.ArticoloRepositorySpringData;
 import it.jdk.gestioneforum.cms.repository.categoria.CategoriaRepositorySpringData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +23,15 @@ public class SezioneSDRepo implements RepositorySezione {
 
     private final SezioneRepositorySpringData sezioneSDRepo;
     private final CategoriaRepositorySpringData categoriaSDRepo;
+    private final ArticoloRepositorySpringData articoloSDRepo;
 
     @Autowired
-    public SezioneSDRepo(SezioneRepositorySpringData sezioneSDRepo, CategoriaRepositorySpringData categoriaSDRepo) {
+    public SezioneSDRepo(SezioneRepositorySpringData sezioneSDRepo,
+                         CategoriaRepositorySpringData categoriaSDRepo,
+                         ArticoloRepositorySpringData articoloSDRepo) {
         this.sezioneSDRepo = sezioneSDRepo;
         this.categoriaSDRepo = categoriaSDRepo;
+        this.articoloSDRepo = articoloSDRepo;
     }
 
     @Override
@@ -83,60 +89,38 @@ public class SezioneSDRepo implements RepositorySezione {
     @Transactional(readOnly = false, rollbackFor = {RuntimeException.class, RepositoryException.class})
     public void deleteSezione(Sezione sezione) throws RepositoryException {
         Optional<SezioneEntity> sezioneEntity = sezioneSDRepo.findById(sezione.getId());
-
-        if (sezioneEntity.isPresent()) {
+        List<ArticoloEntity> articoli = articoloSDRepo.findAllArticlesByIdSezione(sezione.getId());
+        if (sezioneEntity.isPresent() && articoli.isEmpty()) {
             sezioneSDRepo.delete(sezioneEntity.get());
         } else
-            throw new RepositoryException("La sezione con id " + sezione.getId() + " non è stata trovata");
+            throw new RepositoryException("La sezione con id " + sezione.getId() +
+                    " non è stata trovata, oppure sono ancora presenti articoli in questa sezione");
     }
 
     @Override
-    public List<Articolo> showArticoli(String titoloSezione) throws RepositoryException {
-        Optional<SezioneEntity> sezioneEntityOp = sezioneSDRepo.findByTitolo(titoloSezione);
-        if (sezioneEntityOp.isPresent()) {
-            List<ArticoloEntity> articoliEntity = sezioneSDRepo.findAllArticlesById(sezioneEntityOp.get().getId());
+    public List<Articolo> showArticoli(Integer id) throws RepositoryException {
+        Optional<SezioneEntity> sezioneEntityOp = sezioneSDRepo.findById(id);
+        if(sezioneEntityOp.isPresent()) {
+            Pageable pageRequest = PageRequest.of(0, 5);
+            List<ArticoloEntity> articoliEntity =
+                    articoloSDRepo.findAllBySezione(sezioneEntityOp.get().getId(), pageRequest);
             List<Articolo> articoli = new ArrayList<>();
-            for (ArticoloEntity ent : articoliEntity) {
-                Articolo articolo = convertArticolo(ent);
+            for(ArticoloEntity a : articoliEntity) {
+                Articolo articolo = new Articolo(a.getTitolo(), a.getData(), a.getTesto());
                 articoli.add(articolo);
             }
             return articoli;
         } else
-            throw new RepositoryException("Non è stato trovato nessun articolo relativo a questa sezione");
+            throw new RepositoryException("Non è stato trovato nessun articolo relativo a questa categoria");
     }
 
     @Override
-    public Sezione showSezione(String titolo) throws RepositoryException {
-        Optional<SezioneEntity> sezioneEntity = sezioneSDRepo.findByTitolo(titolo);
+    public Sezione showSezione(Integer id) throws RepositoryException {
+        Optional<SezioneEntity> sezioneEntity = sezioneSDRepo.findById(id);
         if (sezioneEntity.isPresent()) {
             return convertSezione(sezioneEntity.get());
         } else
             throw new RepositoryException("La categoria richiesta non è stata trovata");
-    }
-
-    private Articolo convertArticolo(ArticoloEntity articoloEntity) {
-        Articolo articolo = new Articolo();
-
-        Sezione sezione = new Sezione();
-        sezione.setTitolo(articoloEntity.getSezione().getTitolo());
-        sezione.setDescrizione(articoloEntity.getSezione().getDescrizione());
-        sezione.setId(articoloEntity.getSezione().getId());
-        sezione.setVersione(articoloEntity.getSezione().getVersione());
-
-        Categoria categoria = new Categoria();
-        categoria.setTitolo(articoloEntity.getSezione().getTitolo());
-        categoria.setDescrizione(articoloEntity.getSezione().getDescrizione());
-        categoria.setId(articoloEntity.getSezione().getId());
-        categoria.setVersione(articoloEntity.getSezione().getVersione());
-
-        articolo.setId(articoloEntity.getId());
-        articolo.setTitolo(articolo.getTitolo());
-        articolo.setTesto(articolo.getTesto());
-        articolo.setSezione(sezione);
-        articolo.setCategoria(categoria);
-        articolo.setVersione(articoloEntity.getVersione());
-
-        return articolo;
     }
 
     private Sezione convertSezione(SezioneEntity sezioneEntity) {

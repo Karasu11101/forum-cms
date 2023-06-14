@@ -1,6 +1,7 @@
 package it.jdk.gestioneforum.cms.controller;
 
 import it.jdk.gestioneforum.cms.$exception.ServiceException;
+import it.jdk.gestioneforum.cms.model.Articolo;
 import it.jdk.gestioneforum.cms.model.Sezione;
 import it.jdk.gestioneforum.cms.service.sezione.SezioneServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -56,15 +58,25 @@ public class SezioneController {
     }
 
     @GetMapping(
-            value = "/show/{titolo}",
+            value = "/show/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Optional<Sezione>> showSezione
-            (@PathVariable String titolo) throws ServiceException {
-        Optional<Sezione> sezioneR = sezioneServiceInterface.showSezione(titolo);
+            (@PathVariable Integer id) throws ServiceException {
+        Optional<Sezione> sezioneR = sezioneServiceInterface.showSezione(id);
         if(sezioneR.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(sezioneR);
         } else
             throw new ServiceException("Articolo non trovato");
+    }
+
+    @GetMapping(
+            value = "/showArticoli/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<Articolo>> showArticoli
+            (@PathVariable Integer id) throws ServiceException {
+        List<Articolo> articoliR = sezioneServiceInterface.showArticoli(id);
+        return ResponseEntity.status(HttpStatus.OK).body(articoliR);
     }
 }

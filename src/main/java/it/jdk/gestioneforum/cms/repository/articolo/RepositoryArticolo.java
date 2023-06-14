@@ -9,5 +9,5 @@ public interface RepositoryArticolo {
     public Articolo createArticolo(Articolo articolo) throws RepositoryException;
     public Articolo updateArticolo(Articolo articolo) throws RepositoryException;
     public void deleteArticolo(Articolo articolo) throws RepositoryException;
-    public Articolo showArticolo(String titolo) throws RepositoryException;
+    public Articolo showArticolo(Integer id) throws RepositoryException;
 }

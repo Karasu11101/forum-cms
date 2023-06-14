@@ -32,7 +32,7 @@ public class SezioneService implements SezioneServiceInterface {
         try {
             return repositorySezione.createSezione(sezione);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
@@ -42,7 +42,7 @@ public class SezioneService implements SezioneServiceInterface {
         try {
             return repositorySezione.updateSezione(sezione);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
@@ -53,25 +53,26 @@ public class SezioneService implements SezioneServiceInterface {
         try {
             repositorySezione.deleteSezione(sezione);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
     @Override
-    public List<Articolo> showArticoli(String titoloSezione) throws ServiceException {
+    public List<Articolo> showArticoli(Integer id) throws ServiceException {
         try {
-            return repositorySezione.showArticoli(titoloSezione);
+            return repositorySezione.showArticoli(id);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Optional<Sezione> showSezione(String titolo) throws ServiceException {
+    public Optional<Sezione> showSezione(Integer id) throws ServiceException {
         try {
-            return Optional.of(repositorySezione.showSezione(titolo));
+            return Optional.of(repositorySezione.showSezione(id));
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 }

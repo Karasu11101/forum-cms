@@ -3,11 +3,12 @@ package it.jdk.gestioneforum.cms.repository.categoria;
 import it.jdk.gestioneforum.cms.$exception.RepositoryException;
 import it.jdk.gestioneforum.cms.model.Articolo;
 import it.jdk.gestioneforum.cms.model.Categoria;
-import it.jdk.gestioneforum.cms.model.Sezione;
 import it.jdk.gestioneforum.cms.persistence.ArticoloEntity;
 import it.jdk.gestioneforum.cms.persistence.CategoriaEntity;
+import it.jdk.gestioneforum.cms.repository.articolo.ArticoloRepositorySpringData;
 import it.jdk.gestioneforum.cms.repository.sezione.SezioneRepositorySpringData;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +21,14 @@ import java.util.Optional;
 public class CategoriaSDRepo implements RepositoryCategoria {
 
     private final CategoriaRepositorySpringData categoriaSDRepo;
+    private final ArticoloRepositorySpringData articoloSDRepo;
     private final SezioneRepositorySpringData sezioneSDRepo;
 
-    @Autowired
-    public CategoriaSDRepo(CategoriaRepositorySpringData categoriaSDRepo, SezioneRepositorySpringData sezioneSDRepo) {
+    public CategoriaSDRepo(CategoriaRepositorySpringData categoriaSDRepo,
+                           ArticoloRepositorySpringData articoloSDRepo,
+                           SezioneRepositorySpringData sezioneSDRepo) {
         this.categoriaSDRepo = categoriaSDRepo;
+        this.articoloSDRepo = articoloSDRepo;
         this.sezioneSDRepo = sezioneSDRepo;
     }
 
@@ -79,61 +83,39 @@ public class CategoriaSDRepo implements RepositoryCategoria {
     @Override
     @Transactional(readOnly = false, rollbackFor = {RuntimeException.class, RepositoryException.class})
     public void deleteCategoria(Categoria categoria) throws RepositoryException {
-        Optional<CategoriaEntity> categoriaEntityOp = categoriaSDRepo.findById(categoria.getId());
-
-        if(categoriaEntityOp.isPresent()) {
-            categoriaSDRepo.delete(categoriaEntityOp.get());
+        Optional<CategoriaEntity> categoriaEntity = categoriaSDRepo.findById(categoria.getId());
+        List<ArticoloEntity> articoli = articoloSDRepo.findAllArticlesByIdCategoria(categoria.getId());
+        if (categoriaEntity.isPresent() && articoli.isEmpty()) {
+            categoriaSDRepo.delete(categoriaEntity.get());
         } else
-            throw new RepositoryException("La categoria con id " + categoria.getId() + " non è stata trovata");
+            throw new RepositoryException("La categoria con id " + categoria.getId() +
+                    " non è stata trovata, oppure sono ancora presenti articoli in questa sezione");
     }
 
     @Override
-    public List<Articolo> showArticoli(String titolo) throws RepositoryException {
-        Optional<CategoriaEntity> categoriaEntityOp = categoriaSDRepo.findByTitolo(titolo);
+    public List<Articolo> showArticoli(Integer id) throws RepositoryException {
+        Optional<CategoriaEntity> categoriaEntityOp = categoriaSDRepo.findById(id);
         if(categoriaEntityOp.isPresent()) {
-            List<ArticoloEntity> articoliEntity = categoriaSDRepo.findAllArticlesById(categoriaEntityOp.get().getId());
+            Pageable pageRequest = PageRequest.of(0, 5);
+            List<ArticoloEntity> articoliEntity =
+                    articoloSDRepo.findAllByCategoria(categoriaEntityOp.get().getId(), pageRequest);
             List<Articolo> articoli = new ArrayList<>();
-            for(ArticoloEntity ent : articoliEntity) {
-                Articolo articolo = convertArticolo(ent);
+            for(ArticoloEntity a : articoliEntity) {
+                Articolo articolo = new Articolo(a.getTitolo(), a.getData(), a.getTesto());
                 articoli.add(articolo);
             }
             return articoli;
-        } else
+            } else
             throw new RepositoryException("Non è stato trovato nessun articolo relativo a questa categoria");
     }
 
     @Override
-    public Categoria showCategoria(String titolo) throws RepositoryException {
-        Optional<CategoriaEntity> categoriaEntity = categoriaSDRepo.findByTitolo(titolo);
+    public Categoria showCategoria(Integer id) throws RepositoryException {
+        Optional<CategoriaEntity> categoriaEntity = categoriaSDRepo.findById(id);
         if(categoriaEntity.isPresent()) {
             return convertCategoria(categoriaEntity.get());
         } else
             throw new RepositoryException("La categoria richiesta non è stata trovata");
-    }
-
-    private Articolo convertArticolo(ArticoloEntity articoloEntity) {
-        Articolo articolo = new Articolo();
-
-        Sezione sezione = new Sezione();
-        sezione.setTitolo(articoloEntity.getSezione().getTitolo());
-        sezione.setDescrizione(articoloEntity.getSezione().getDescrizione());
-        sezione.setId(articoloEntity.getSezione().getId());
-        sezione.setVersione(articoloEntity.getSezione().getVersione());
-
-        Categoria categoria = new Categoria();
-        categoria.setTitolo(articoloEntity.getSezione().getTitolo());
-        categoria.setDescrizione(articoloEntity.getSezione().getDescrizione());
-        categoria.setId(articoloEntity.getSezione().getId());
-        categoria.setVersione(articoloEntity.getSezione().getVersione());
-
-        articolo.setId(articoloEntity.getId());
-        articolo.setTitolo(articolo.getTitolo());
-        articolo.setTesto(articolo.getTesto());
-        articolo.setSezione(sezione);
-        articolo.setCategoria(categoria);
-        articolo.setVersione(articoloEntity.getVersione());
-
-        return articolo;
     }
 
     private Categoria convertCategoria(CategoriaEntity categoriaEntity) {

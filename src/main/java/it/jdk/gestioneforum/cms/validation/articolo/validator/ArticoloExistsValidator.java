@@ -1,16 +1,16 @@
 package it.jdk.gestioneforum.cms.validation.articolo.validator;
 
-import it.jdk.gestioneforum.cms.$exception.RepositoryException;
 import it.jdk.gestioneforum.cms.repository.articolo.ArticoloRepositorySpringData;
 import it.jdk.gestioneforum.cms.validation.articolo.annotation.ArticoloExists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 @Component
-public class ArticoloExistsValidator implements ConstraintValidator<ArticoloExists, String> {
+public class ArticoloExistsValidator implements ConstraintValidator<ArticoloExists, Integer> {
 
     private final ArticoloRepositorySpringData repositoryArticolo;
 
@@ -20,10 +20,10 @@ public class ArticoloExistsValidator implements ConstraintValidator<ArticoloExis
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Integer s, ConstraintValidatorContext constraintValidatorContext) {
         try {
-            return repositoryArticolo.findByTitolo(s).isPresent();
-        } catch (RepositoryException e) {
+            return repositoryArticolo.findById(s).isPresent();
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }

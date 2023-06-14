@@ -9,5 +9,5 @@ public interface ArticoloServiceInterface {
     public Articolo createArticolo(Articolo articolo) throws ServiceException;
     public Articolo updateArticolo(Articolo articolo) throws ServiceException;
     public void deleteArticolo(Articolo articolo) throws ServiceException;
-    public Optional<Articolo> showArticolo(String titolo) throws ServiceException;
+    public Optional<Articolo> showArticolo(Integer id) throws ServiceException;
 }

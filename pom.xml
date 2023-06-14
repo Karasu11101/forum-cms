@@ -12,7 +12,7 @@
 
 	<groupId>it.jdk.gestione-forum</groupId>
 	<artifactId>gestione-forum</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-FINAL</version>
 	<name>gestione-forum</name>
 	<description>cms per gestione forum</description>
 

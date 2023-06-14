@@ -92,9 +92,8 @@ public class ArticoloSDRepo implements RepositoryArticolo {
     }
 
     @Override
-    public Articolo showArticolo(String titolo) throws RepositoryException {
-        String newTitolo = titolo.replaceAll("%20", " ");
-        Optional<ArticoloEntity> articoloEntity = articoloSDRepo.findByTitolo(newTitolo);
+    public Articolo showArticolo(Integer id) throws RepositoryException {
+        Optional<ArticoloEntity> articoloEntity = articoloSDRepo.findArticleById(id);
         if(articoloEntity.isPresent()) {
             return convertArticolo(articoloEntity.get());
         } else
@@ -102,7 +101,7 @@ public class ArticoloSDRepo implements RepositoryArticolo {
     }
 
     private Articolo convertArticolo(ArticoloEntity articoloEntity) {
-        Articolo articolo = new Articolo();
+        Articolo articolo = new Articolo(articoloEntity.getTitolo(), articoloEntity.getData(), articoloEntity.getTesto());
         Sezione sezione = new Sezione();
         sezione.setTitolo(articoloEntity.getSezione().getTitolo());
         sezione.setDescrizione(articoloEntity.getSezione().getDescrizione());
@@ -116,8 +115,6 @@ public class ArticoloSDRepo implements RepositoryArticolo {
         categoria.setVersione(articoloEntity.getSezione().getVersione());
 
         articolo.setId(articoloEntity.getId());
-        articolo.setTitolo(articolo.getTitolo());
-        articolo.setTesto(articolo.getTesto());
         articolo.setSezione(sezione);
         articolo.setCategoria(categoria);
         articolo.setVersione(articoloEntity.getVersione());

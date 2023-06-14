@@ -56,12 +56,12 @@ public class ArticoloController {
     }
 
     @GetMapping(
-            value = "/show/{titolo}",
+            value = "/show/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Optional<Articolo>> showArticolo
-            (@PathVariable String titolo) throws ServiceException {
-        Optional<Articolo> articoloR = articoloService.showArticolo(titolo);
+            (@PathVariable Integer id) throws ServiceException {
+        Optional<Articolo> articoloR = articoloService.showArticolo(id);
         if(articoloR.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(articoloR);
         } else

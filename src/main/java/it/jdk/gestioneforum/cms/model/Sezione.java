@@ -1,6 +1,8 @@
 package it.jdk.gestioneforum.cms.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import it.jdk.gestioneforum.cms.validation.sezione.annotation.SezioneExists;
+import it.jdk.gestioneforum.cms.validation.sezione.annotation.SezioneNotExists;
 import it.jdk.gestioneforum.cms.validation.sezione.group.SezioneValidationGroup.CreateValidationGroup;
 import it.jdk.gestioneforum.cms.validation.sezione.group.SezioneValidationGroup.DeleteValidationGroup;
 import it.jdk.gestioneforum.cms.validation.sezione.group.SezioneValidationGroup.UpdateValidationGroup;
@@ -30,8 +32,7 @@ public class Sezione {
 
     @NotNull(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotBlank(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @SezioneExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @SezioneNotExists(groups = {CreateValidationGroup.class})
+    @SezioneNotExists(groups = {CreateValidationGroup.class})
     public String getTitolo() {
         return titolo;
     }
@@ -58,6 +59,7 @@ public class Sezione {
         this.articoli = articoli;
     }
 
+    @SezioneExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotNull(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     public Integer getId() {
         return id;

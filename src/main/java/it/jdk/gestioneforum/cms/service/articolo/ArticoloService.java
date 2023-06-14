@@ -32,7 +32,7 @@ public class ArticoloService implements ArticoloServiceInterface {
         try {
             return repositoryArticolo.createArticolo(articolo);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
@@ -42,7 +42,7 @@ public class ArticoloService implements ArticoloServiceInterface {
         try {
             return repositoryArticolo.updateArticolo(articolo);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
@@ -52,16 +52,16 @@ public class ArticoloService implements ArticoloServiceInterface {
         try {
             repositoryArticolo.deleteArticolo(articolo);
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Optional<Articolo> showArticolo(String titolo) throws ServiceException {
+    public Optional<Articolo> showArticolo(Integer id) throws ServiceException {
         try {
-            return Optional.of(repositoryArticolo.showArticolo(titolo));
+            return Optional.of(repositoryArticolo.showArticolo(id));
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 }

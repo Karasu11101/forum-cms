@@ -1,6 +1,8 @@
 package it.jdk.gestioneforum.cms.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import it.jdk.gestioneforum.cms.validation.articolo.annotation.ArticoloExists;
+import it.jdk.gestioneforum.cms.validation.articolo.annotation.ArticoloNotExists;
 import it.jdk.gestioneforum.cms.validation.articolo.group.ArticoloValidationGroup.CreateValidationGroup;
 import it.jdk.gestioneforum.cms.validation.articolo.group.ArticoloValidationGroup.DeleteValidationGroup;
 import it.jdk.gestioneforum.cms.validation.articolo.group.ArticoloValidationGroup.UpdateValidationGroup;
@@ -34,10 +36,15 @@ public class Articolo {
         this.categoria = categoria;
     }
 
+    public Articolo(String titolo, String data, String testo) {
+        this.titolo = titolo;
+        this.data = data;
+        this.testo = testo;
+    }
+
     @NotNull(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotBlank(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @ArticoloExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @ArticoloNotExists(groups = {CreateValidationGroup.class})
+    @ArticoloNotExists(groups = {CreateValidationGroup.class})
     public String getTitolo() {
         return titolo;
     }
@@ -66,7 +73,6 @@ public class Articolo {
     }
 
     @NotNull(groups = {CreateValidationGroup.class, UpdateValidationGroup.class})
-//    @SezioneExists(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
     public Sezione getSezione() {
         return sezione;
     }
@@ -76,7 +82,6 @@ public class Articolo {
     }
 
     @NotNull(groups = {CreateValidationGroup.class, UpdateValidationGroup.class})
-//    @CategoriaExists(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
     public Categoria getCategoria() {
         return categoria;
     }
@@ -85,6 +90,7 @@ public class Articolo {
         this.categoria = categoria;
     }
 
+    @ArticoloExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotNull(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     public Integer getId() {
         return id;

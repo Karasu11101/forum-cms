@@ -61,20 +61,20 @@ public class CategoriaService implements CategoriaServiceInterface {
     }
 
     @Override
-    public List<Articolo> showArticoli(String titoloCategoria) throws ServiceException {
+    public List<Articolo> showArticoli(Integer id) throws ServiceException {
         try {
-            return repositoryCategoria.showArticoli(titoloCategoria);
+            return repositoryCategoria.showArticoli(id);
         } catch (RepositoryException e) {
             throw new ServiceException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Optional<Categoria> showCategoria(String titolo) throws ServiceException {
+    public Optional<Categoria> showCategoria(Integer id) throws ServiceException {
         try {
-            return Optional.of(repositoryCategoria.showCategoria(titolo));
+            return Optional.of(repositoryCategoria.showCategoria(id));
         } catch (RepositoryException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
     }
 }

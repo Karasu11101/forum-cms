@@ -12,17 +12,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.internalServerError;
 
 @RestControllerAdvice
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {ServiceException.class})
-    public ResponseEntity<String> handleServiceException(ServiceException serviceException) {
-        return new ResponseEntity<>(serviceException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Map<Object, Object>> handleServiceException(ServiceException serviceException) {
+        Map<Object,Object> response = new HashMap<>();
+        response.put("error", serviceException.getMessage());
+        serviceException.printStackTrace();
+        return internalServerError().body(response);
+    }
+
+    @ExceptionHandler(value = {ConstraintViolationException.class})
+    public ResponseEntity<Object> handleConstraintException(ConstraintViolationException exception) {
+        Map<String, String> errors = new HashMap<>();
+        Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        for(ConstraintViolation<?> constraintViolation: constraintViolations) {
+            String fieldName = null;
+            Iterator iterator = constraintViolation.getPropertyPath().iterator();
+            while(iterator.hasNext())
+                fieldName = iterator.next().toString();
+            errors.put(fieldName, constraintViolation.getMessage());
+        }
+        return badRequest().body(errors);
     }
 
     @Override

@@ -12,6 +12,6 @@ public interface RepositoryCategoria {
     public Categoria createCategoria(Categoria categoria) throws RepositoryException;
     public Categoria updateCategoria(Categoria categoria) throws RepositoryException;
     public void deleteCategoria(Categoria categoria) throws RepositoryException;
-    public List<Articolo> showArticoli(String titoloCategoria) throws RepositoryException;
-    public Categoria showCategoria(String titoloCategoria) throws RepositoryException;
+    public List<Articolo> showArticoli(Integer id) throws RepositoryException;
+    public Categoria showCategoria(Integer categoria_id) throws RepositoryException;
 }

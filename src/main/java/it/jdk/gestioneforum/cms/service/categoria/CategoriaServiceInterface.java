@@ -11,6 +11,6 @@ public interface CategoriaServiceInterface {
     public Categoria createCategoria(Categoria categoria) throws ServiceException;
     public Categoria updateCategoria(Categoria categoria) throws ServiceException;
     public void deleteCategoria(Categoria categoria) throws ServiceException;
-    public List<Articolo> showArticoli(String titoloCategoria) throws ServiceException;
-    public Optional<Categoria> showCategoria(String titolo) throws ServiceException;
+    public List<Articolo> showArticoli(Integer id) throws ServiceException;
+    public Optional<Categoria> showCategoria(Integer id) throws ServiceException;
 }

@@ -1,7 +1,11 @@
 package it.jdk.gestioneforum.cms.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import it.jdk.gestioneforum.cms.validation.categoria.group.CategoriaValidationGroup.*;
+import it.jdk.gestioneforum.cms.validation.categoria.annotation.CategoriaExists;
+import it.jdk.gestioneforum.cms.validation.categoria.annotation.CategoriaNotExists;
+import it.jdk.gestioneforum.cms.validation.categoria.group.CategoriaValidationGroup.CreateValidationGroup;
+import it.jdk.gestioneforum.cms.validation.categoria.group.CategoriaValidationGroup.DeleteValidationGroup;
+import it.jdk.gestioneforum.cms.validation.categoria.group.CategoriaValidationGroup.UpdateValidationGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotBlank;
@@ -27,8 +31,7 @@ public class Categoria {
 
     @NotNull(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotBlank(groups = {CreateValidationGroup.class, UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @CategoriaExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
-//    @CategoriaNotExists(groups = {CreateValidationGroup.class})
+    @CategoriaNotExists(groups = {CreateValidationGroup.class})
     public String getTitolo() {
         return titolo;
     }
@@ -54,6 +57,8 @@ public class Categoria {
     public void setArticoli(List<Articolo> articoli) {
         this.articoli = articoli;
     }
+
+    @CategoriaExists(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     @NotNull(groups = {UpdateValidationGroup.class, DeleteValidationGroup.class})
     public Integer getId() {
         return id;

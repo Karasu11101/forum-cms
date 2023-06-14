@@ -11,6 +11,6 @@ public interface SezioneServiceInterface {
     public Sezione createSezione(Sezione sezione) throws ServiceException;
     public Sezione updateSezione(Sezione sezione) throws ServiceException;
     public void deleteSezione(Sezione sezione) throws ServiceException;
-    public List<Articolo> showArticoli(String titoloSezione) throws ServiceException;
-    public Optional<Sezione> showSezione(String titolo) throws ServiceException;
+    public List<Articolo> showArticoli(Integer id) throws ServiceException;
+    public Optional<Sezione> showSezione(Integer id) throws ServiceException;
 }

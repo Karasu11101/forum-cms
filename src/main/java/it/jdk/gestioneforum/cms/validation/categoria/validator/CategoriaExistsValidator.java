@@ -1,16 +1,16 @@
 package it.jdk.gestioneforum.cms.validation.categoria.validator;
 
-import it.jdk.gestioneforum.cms.$exception.RepositoryException;
 import it.jdk.gestioneforum.cms.repository.categoria.CategoriaRepositorySpringData;
 import it.jdk.gestioneforum.cms.validation.categoria.annotation.CategoriaExists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 @Component
-public class CategoriaExistsValidator implements ConstraintValidator<CategoriaExists, String> {
+public class CategoriaExistsValidator implements ConstraintValidator<CategoriaExists, Integer> {
 
     private final CategoriaRepositorySpringData repositoryCategoria;
 
@@ -20,10 +20,10 @@ public class CategoriaExistsValidator implements ConstraintValidator<CategoriaEx
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Integer s, ConstraintValidatorContext constraintValidatorContext) {
         try {
-            return repositoryCategoria.findByTitolo(s).isPresent();
-        } catch (RepositoryException e) {
+            return repositoryCategoria.findById(s).isPresent();
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
